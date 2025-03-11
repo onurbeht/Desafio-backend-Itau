@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bruno.desafio_itau.dtos.TransacaoRequestDto;
 import com.bruno.desafio_itau.service.TransacaoService;
 
+import org.springframework.web.bind.annotation.GetMapping;
+
+import com.bruno.desafio_itau.dtos.EstatisticaResponseDto;
 
 @RestController
 @RequestMapping("/transacao")
@@ -22,7 +25,7 @@ public class TransacaoController {
     }
 
     @PostMapping()
-    public ResponseEntity<?> receberTransacao(@RequestBody TransacaoRequestDto request) {
+    public ResponseEntity<Void> receberTransacao(@RequestBody TransacaoRequestDto request) {
         
         transacaoService.criarTransacao(request);
         
@@ -30,11 +33,17 @@ public class TransacaoController {
     }
 
     @DeleteMapping
-    public ResponseEntity<?> apagarTransacoes() {
+    public ResponseEntity<Void> apagarTransacoes() {
         
         transacaoService.apagarTransacoes();
 
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/estatistica")
+    public ResponseEntity<EstatisticaResponseDto> estatisticas() {
+        return ResponseEntity.ok(transacaoService.estatisticas());
+    }
+    
 
 }
