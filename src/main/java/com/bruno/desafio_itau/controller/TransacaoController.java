@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bruno.desafio_itau.dtos.TransacaoRequestDto;
 import com.bruno.desafio_itau.service.TransacaoService;
 
+import jakarta.validation.Valid;
+
 import org.springframework.web.bind.annotation.GetMapping;
 
 import com.bruno.desafio_itau.dtos.EstatisticaResponseDto;
@@ -25,16 +27,16 @@ public class TransacaoController {
     }
 
     @PostMapping()
-    public ResponseEntity<Void> receberTransacao(@RequestBody TransacaoRequestDto request) {
-        
+    public ResponseEntity<Void> receberTransacao(@RequestBody @Valid TransacaoRequestDto request) {
+
         transacaoService.criarTransacao(request);
-        
+
         return ResponseEntity.status(201).build();
     }
 
     @DeleteMapping
     public ResponseEntity<Void> apagarTransacoes() {
-        
+
         transacaoService.apagarTransacoes();
 
         return ResponseEntity.ok().build();
@@ -44,6 +46,5 @@ public class TransacaoController {
     public ResponseEntity<EstatisticaResponseDto> estatisticas() {
         return ResponseEntity.ok(transacaoService.estatisticas());
     }
-    
 
 }

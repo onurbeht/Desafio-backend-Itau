@@ -1,7 +1,6 @@
 package com.bruno.desafio_itau.service;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.DoubleSummaryStatistics;
@@ -20,14 +19,13 @@ import com.bruno.desafio_itau.dtos.TransacaoRequestDto;
 public class TransacaoService {
 
     private final NavigableMap<LocalDateTime, List<Transacao>> historico;
-    private final DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
 
     public TransacaoService(TreeMap<LocalDateTime, List<Transacao>> historico) {
         this.historico = historico;
     }
 
     public Transacao criarTransacao(TransacaoRequestDto request) {
-        Transacao transacao = Transacao.builder().valor(request.valor()).dataHora(LocalDateTime.parse(request.dataHora(), formatter)).build();
+        Transacao transacao = Transacao.builder().valor(request.valor()).dataHora(request.dataHora()).build();
 
         salvarTransacao(transacao);
 
@@ -35,7 +33,8 @@ public class TransacaoService {
     }
 
     public void salvarTransacao(Transacao transacao) {
-        historico.computeIfAbsent(transacao.getDataHora().truncatedTo(ChronoUnit.MINUTES), k -> new ArrayList<Transacao>()).add(transacao);
+        historico.computeIfAbsent(transacao.getDataHora().truncatedTo(ChronoUnit.MINUTES),
+                k -> new ArrayList<Transacao>()).add(transacao);
     }
 
     public void apagarTransacoes() {
@@ -48,15 +47,16 @@ public class TransacaoService {
 
         List<Transacao> transacoes = historico.get(currentTime.truncatedTo(ChronoUnit.MINUTES));
 
-        if(transacoes == null) {
+        if (transacoes == null) {
             return new EstatisticaResponseDto(0L, 0.0, 0.0, 0.0, 0.0);
         }
 
-                                    // para cada Transacao na lista > pega o valor de cada transacao > faz as operações: count, sum, avg, min, max
+        // para cada Transacao na lista > pega o valor de cada transacao > faz as
+        // operações: count, sum, avg, min, max
         DoubleSummaryStatistics est = transacoes.stream().collect(Collectors.summarizingDouble(Transacao::getValor));
 
         return new EstatisticaResponseDto(est.getCount(), est.getSum(), est.getAverage(), est.getMax(), est.getMin());
-        
+
     }
 
 }
