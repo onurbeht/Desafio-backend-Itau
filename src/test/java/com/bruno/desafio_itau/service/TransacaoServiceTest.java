@@ -6,10 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Comparator;
 import java.util.NavigableMap;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -26,7 +26,7 @@ import com.bruno.desafio_itau.dtos.TransacaoRequestDto;
 public class TransacaoServiceTest {
 
     @Mock
-    NavigableMap<LocalDateTime, List<Transacao>> historico;
+    NavigableMap<LocalDateTime, TreeSet<Transacao>> historico;
 
     TransacaoService transacaoService;
 
@@ -39,7 +39,7 @@ public class TransacaoServiceTest {
 
         transacaoRequestDto = new TransacaoRequestDto(100.0, LocalDateTime.now());
 
-        transacaoService = new TransacaoService((TreeMap<LocalDateTime, List<Transacao>>) historico);
+        transacaoService = new TransacaoService((TreeMap<LocalDateTime, TreeSet<Transacao>>) historico);
 
     }
 
@@ -47,7 +47,8 @@ public class TransacaoServiceTest {
     @DisplayName("Deve criar uma transação corretamente")
     void deveCriarUmaTransacaoCorretamente() {
         // Arrange
-        TransacaoRequestDto novaTransacaoDto = new TransacaoRequestDto(50.0, LocalDateTime.now().minusSeconds(1));
+        TransacaoRequestDto novaTransacaoDto = new TransacaoRequestDto(50.0,
+                LocalDateTime.now().minusSeconds(1));
         System.out.println(historico.toString());
 
         // Act
@@ -92,10 +93,10 @@ public class TransacaoServiceTest {
     void deveRetornarEstatisticasCorretamente() {
         // Arrange
         LocalDateTime currentTime = LocalDateTime.now();
-        List<Transacao> transacoes = new ArrayList<>();
-        transacoes.add(Transacao.builder().valor(10.0).dataHora(currentTime).build());
-        transacoes.add(Transacao.builder().valor(20.0).dataHora(currentTime).build());
-        transacoes.add(Transacao.builder().valor(30.0).dataHora(currentTime).build());
+        TreeSet<Transacao> transacoes = new TreeSet<>(Comparator.comparing(Transacao::getDataHora));
+        transacoes.add(Transacao.builder().valor(10.0).dataHora(currentTime.minusSeconds(1)).build());
+        transacoes.add(Transacao.builder().valor(20.0).dataHora(currentTime.minusSeconds(2)).build());
+        transacoes.add(Transacao.builder().valor(30.0).dataHora(currentTime.minusSeconds(3)).build());
 
         historico.put(currentTime.truncatedTo(ChronoUnit.MINUTES), transacoes);
         // Act
